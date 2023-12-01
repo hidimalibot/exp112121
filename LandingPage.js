@@ -1,8 +1,9 @@
+// LandingPage.js
 import React, { useState, useEffect } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ScrollView, StyleSheet, Pressable } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import ProductProfile from './ProductProfile';
 import { db } from './firebase/index';
 
@@ -43,7 +44,6 @@ const LandingPage = () => {
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
   const navigateToEditScreen = (productId) => {
     navigation.navigate('EditProductScreen', { productData: productId, onSave: handleSave });
   };
@@ -52,15 +52,25 @@ const LandingPage = () => {
     console.log('Save edited product:', editedProduct);
   };
 
-  // Define onEdit function to be passed to ProductProfile
   const handleEdit = (productId) => {
-    // Implement your logic to navigate to the EditProduct screen with the product ID
     console.log('Edit product with ID:', productId);
+  };
+
+  const handleDelete = async (productId) => {
+    try {
+      await deleteDoc(doc(db, 'products', productId));
+
+      const updatedProducts = expiringProducts.filter((product) => product.id !== productId);
+      setExpiringProducts(updatedProducts);
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setErrorMessage('Error deleting product');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Expiring Products</Text>
+      <Text style={styles.title}>PRODUCTS</Text>
       {errorMessage ? (
         <Text style={styles.errorMessage}>{errorMessage}</Text>
       ) : (
@@ -80,43 +90,43 @@ const LandingPage = () => {
                 style={styles.productItem}
                 onPress={() => navigateToEditScreen(product.id)}
               >
-                {/* Pass onEdit as a prop to ProductProfile */}
-                <ProductProfile productData={product} onEdit={handleEdit} />
+                <ProductProfile productData={product} onEdit={handleEdit} onDelete={handleDelete} />
               </TouchableOpacity>
             ))}
           </ScrollView>
         </>
       )}
-         <View style={styles.violetContainer}>
-          <View style={styles.pressablesContainer}>
-            <TouchableOpacity
-              style={styles.pressable}
-              onPress={() => {
-                navigation.navigate('Landing');
-              }}
-            >
-              <Icon name="home" type="font-awesome" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.pressable}
-              onPress={() => {
-                navigation.navigate('ExpiTrack');
-              }}
-            >
-              <Icon name="calendar" type="font-awesome" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.pressable}
-              onPress={() => {
-                // Handle onPress for the third icon
-              }}
-            >
-              <Icon name="question" type="font-awesome" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
+<View style={styles.violetContainer}>
+  <View style={styles.pressablesContainer}>
+    <TouchableOpacity
+      style={styles.pressable}
+      onPress={() => {
+        navigation.replace('Landing');
+      }}
+    >
+      <Icon name="home" type="font-awesome" size={24} color="black" />
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.pressable}
+      onPress={() => {
+        navigation.navigate('ExpiTrack');
+      }}
+    >
+      {/* Change the icon name to "bars" for a menu icon */}
+      <Icon name="bars" type="font-awesome" size={24} color="black" />
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.pressable}
+      onPress={() => {
+        navigation.navigate('Help');
+      }}
+    >
+      {/* Change the icon name to "calendar" */}
+      <Icon name="calendar" type="font-awesome" size={24} color="black" />
+    </TouchableOpacity>
+  </View>
+</View>
+    </View>
   );
 };
 
@@ -130,7 +140,8 @@ const styles = StyleSheet.create({
   title: {
     color: '#2d0c57',
     fontSize: 45,
-    fontWeight: 'thin',
+    fontWeight: 'bold', // Change 'thin' to 'bold'
+    top: 30,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -140,6 +151,7 @@ const styles = StyleSheet.create({
     borderColor: '#d4bfb0',
     alignContent: 'center',
     alignItems: 'center',
+    top: 50,
   },
   textInput: {
     color: '#9586A8',
@@ -153,6 +165,7 @@ const styles = StyleSheet.create({
   },
   productContainer: {
     maxHeight: 420,
+    top: 80,
   },
   productItem: {
     marginBottom: 16,

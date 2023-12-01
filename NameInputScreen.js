@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
     color: '#2d0c57',
     fontSize: 40,
     fontWeight: 'thin',
-    fontFamily: 'helvetica',
   },
   doneContainer: {
     marginTop: 20,

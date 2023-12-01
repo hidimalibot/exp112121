@@ -1,13 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, Text, View, Button, StyleSheet } from 'react-native';
+import { ScrollView, Text, View, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import AddProductForm from './AddProductForm';
 import ProductProfile from './ProductProfile';
-import { collection, addDoc, setDoc, db, doc, getDocs, query, where } from './firebase/index';
+import { collection, addDoc, setDoc, db, doc, getDocs, query, where, deleteDoc } from './firebase/index';
+import { Icon } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
+
 
 const ProductInputScreen = ({ route, navigation }) => {
   const { category } = route.params;
   const [productList, setProductList] = useState([]);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+
+  const filterProductsByPeriod = (period) => {
+    const now = new Date();
+    const end = new Date();
+
+    switch (period) {
+      case 'day':
+        end.setDate(now.getDate() + 1);
+        break;
+      case 'week':
+        end.setDate(now.getDate() + 7);
+        break;
+      case 'month':
+        end.setMonth(now.getMonth() + 1);
+        break;
+      default:
+        break;
+    }
+
+    return productList.filter((product) => new Date(product.expirationDate) <= end);
+  };
 
   const handleAddProduct = async (productName) => {
     const productData = { name: productName, category, expirationDate: 'N/A' };
@@ -44,6 +68,15 @@ const ProductInputScreen = ({ route, navigation }) => {
     setProductList(updatedList);
   };
 
+  const handleDeleteProduct = async (productId) => {
+    // Remove the product from the 'products' collection in the database
+    await deleteDoc(doc(db, 'products', productId));
+
+    // Update the local product list
+    const updatedList = productList.filter((product) => product.id !== productId);
+    setProductList(updatedList);
+  };
+
   const handleAddButtonPress = () => {
     setIsAddingProduct(true);
   };
@@ -73,7 +106,13 @@ const ProductInputScreen = ({ route, navigation }) => {
       ) : (
         <View>
           {productList.map((product) => (
-            <ProductProfile key={product.id} productData={product} onEdit={() => handleEditProduct(product)} />
+            <View key={product.id}>
+              <ProductProfile
+                productData={product}
+                onEdit={() => handleEditProduct(product)}
+                onDelete={() => handleDeleteProduct(product.id)}
+              />
+            </View>
           ))}
           <Button title="Add" onPress={handleAddButtonPress} />
         </View>

@@ -7,7 +7,22 @@ import { db, collection, getDocs } from './firebase/index';
 const HomeScreen = () => {
   const [nameList, setNameList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState(generateRandomColor()); // Initial random color
   const navigation = useNavigation();
+
+  function generateRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  function generateColorByIndex(index) {
+    const colors = ['#EC7063', '#9B59B6', '#3498DB', '#1ABC9C', '#2C3E50', '#F4D03F'];
+    return colors[index % colors.length];
+  }
 
   const addNameToList = (name) => {
     setNameList([...nameList, name]);
@@ -23,7 +38,10 @@ const HomeScreen = () => {
         categories.push(doc.data().name);
       });
 
-      setNameList(categories);
+      // Sort the categories alphabetically
+      const sortedCategories = categories.sort((a, b) => a.localeCompare(b));
+      
+      setNameList(sortedCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -39,12 +57,12 @@ const HomeScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: backgroundColor }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -100}
     >
       <View style={styles.container}>
-        <Text style={styles.textAbove}>Categories</Text>
+        <Text style={styles.textAbove}>CATEGORIES</Text>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.textInput}
@@ -64,12 +82,13 @@ const HomeScreen = () => {
                 style={[
                   styles.nameBox,
                   index % 2 === 0 ? styles.leftNameBox : styles.rightNameBox,
+                  { backgroundColor: generateColorByIndex(index) },
                 ]}
                 onPress={() => {
                   navigation.navigate('ProductInput', { category: name });
                 }}
               >
-                <Text>{name}</Text>
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>{name}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -85,39 +104,39 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.violetContainer}>
-          <View style={styles.pressablesContainer}>
-            <TouchableOpacity
-              style={styles.pressable}
-              onPress={() => {
-                navigation.replace('Landing');
-              }}
-            >
-              <Icon name="home" type="font-awesome" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.pressable}
-              onPress={() => {
-                navigation.navigate('ExpiTrack');
-              }}
-            >
-              <Icon name="calendar" type="font-awesome" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.pressable}
-              onPress={() => {
-              }}
-            >
-              <Icon name="question" type="font-awesome" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
+    <View style={styles.pressablesContainer}>
+    <TouchableOpacity
+      style={styles.pressable}
+      onPress={() => {
+        navigation.replace('Landing');
+      }}
+    >
+      <Icon name="home" type="font-awesome" size={24} color="black" />
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.pressable}
+      onPress={() => {
+        navigation.navigate('ExpiTrack');
+      }}
+    >
+      {/* Change the icon name to "bars" for a menu icon */}
+      <Icon name="bars" type="font-awesome" size={24} color="black" />
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.pressable}
+      onPress={() => {
+        navigation.navigate('Help');
+      }}
+    >
+      {/* Change the icon name to "calendar" */}
+      <Icon name="calendar" type="font-awesome" size={24} color="black" />
+    </TouchableOpacity>
+  </View>
+</View>
       </View>
     </KeyboardAvoidingView>
   );
 };
-
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -131,8 +150,9 @@ const styles = StyleSheet.create({
     color: '#2d0c57',
     fontSize: 45,
     fontWeight: 'thin',
+    fontWeight: 'bold',
     position: 'absolute',
-    top: 40,
+    top: 70,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -164,10 +184,11 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     padding: 40,
     width: '48%',
-    marginVertical: 10,
+    marginVertical: 5,
     borderRadius: 20,
     marginRight: 5,
   },
+  
   leftNameBox: {
     alignSelf: 'flex-start',
   },
