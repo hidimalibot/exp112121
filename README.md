@@ -6,8 +6,8 @@ An innovative and user-friendly mobile application designed to help individuals 
 ## Developed by Jak Roberto
 
 ### Members
-* Briant Bote
-* Harvey Dimalibot
+* Briant Bote -- productinput,UI, homepage
+* Harvey Dimalibot -category, database, delete function, summary of files
 
  Used
 * Expo React Native
