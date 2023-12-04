@@ -6,7 +6,7 @@ An innovative and user-friendly mobile application designed to help individuals 
 ## Developed by Jak Roberto
 
 ### Members
-* Briant Bote -- productinput,UI, homepage
+* Briant Bote -- productinput,UI, homepage, modals
 * Harvey Dimalibot -category, database, delete function, summary of files
 
  Used
