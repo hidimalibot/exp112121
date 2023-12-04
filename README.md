@@ -8,6 +8,7 @@ An innovative and user-friendly mobile application designed to help individuals 
 ### Members
 * Briant Bote -- productinput,UI, homepage, modals
 * Harvey Dimalibot -category, database, delete function, summary of files
+* Villabueva, Gerric - calendar
 
  Used
 * Expo React Native
